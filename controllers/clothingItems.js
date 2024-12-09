@@ -1,5 +1,10 @@
 const clothingItem = require("../models/clothingItem");
 const mongoose = require("mongoose");
+const {
+  DEFAULT_ERROR,
+  INVALID_ERROR_CODE,
+  NOT_FOUND_ERROR,
+} = require("../utils/errors");
 
 const createItem = (req, res) => {
   console.log(req.body);
@@ -13,9 +18,9 @@ const createItem = (req, res) => {
     .catch((e) => {
       console.error(e);
       if (e.name === "ValidationError") {
-        return res.status(400).send({ message: e.message });
+        return res.status(INVALID_ERROR_CODE).send({ message: e.message });
       }
-      return res.status(500).send({ message: e.message, e });
+      return res.status(DEFAULT_ERROR).send({ message: e.message, e });
     });
 };
 
@@ -25,7 +30,7 @@ const getItems = (req, res) => {
     .then((items) => res.status(200).send(items))
     .catch((err) => {
       console.error(err);
-      res.status(500).send({ message: err.message, err });
+      res.status(DEFAULT_ERROR).send({ message: err.message, err });
     });
 };
 
@@ -33,7 +38,7 @@ const likeItem = (req, res) => {
   const { itemId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(itemId)) {
-    return res.status(400).send({ message: "Invalid ID" });
+    return res.status(INVALID_ERROR_CODE).send({ message: "Invalid ID" });
   }
 
   clothingItem
@@ -50,9 +55,9 @@ const likeItem = (req, res) => {
       console.error(e);
 
       if (e.name === "DocumentNotFoundError") {
-        return res.status(404).send({ message: e.message, e });
+        return res.status(NOT_FOUND_ERROR).send({ message: e.message, e });
       }
-      return res.status(500).send({ message: e.message, e });
+      return res.status(DEFAULT_ERROR).send({ message: e.message, e });
     });
 };
 
@@ -60,7 +65,7 @@ const dislikeItem = (req, res) => {
   const { itemId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(itemId)) {
-    return res.status(400).send({ message: "Invalid ID" });
+    return res.status(INVALID_ERROR_CODE).send({ message: "Invalid ID" });
   }
 
   clothingItem
@@ -77,9 +82,9 @@ const dislikeItem = (req, res) => {
       console.error(e);
 
       if (e.name === "DocumentNotFoundError") {
-        return res.status(404).send({ message: e.message, e });
+        return res.status(NOT_FOUND_ERROR).send({ message: e.message, e });
       }
-      return res.status(500).send({ message: e.message, e });
+      return res.status(DEFAULT_ERROR).send({ message: e.message, e });
     });
 };
 
@@ -88,7 +93,7 @@ const deleteItem = (req, res) => {
 
   console.log(itemId);
   if (!mongoose.Types.ObjectId.isValid(itemId)) {
-    return res.status(400).send({ message: "Invalid ID " });
+    return res.status(INVALID_ERROR_CODE).send({ message: "Invalid ID " });
   }
 
   clothingItem
@@ -96,7 +101,7 @@ const deleteItem = (req, res) => {
     .orFail()
     .then((item) => {
       if (!item) {
-        return res.status(404).send({ message: "Item not found" });
+        return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
       }
       return res.status(200).send({});
     })
@@ -104,11 +109,11 @@ const deleteItem = (req, res) => {
       console.error(e);
 
       if (e.name === "CastError") {
-        return res.status(400).send({ message: e.message, e });
+        return res.status(INVALID_ERROR_CODE).send({ message: e.message, e });
       } else if (e.name === "DocumentNotFoundError") {
-        return res.status(404).send({ message: e.message, e });
+        return res.status(NOT_FOUND_ERROR).send({ message: e.message, e });
       }
-      return res.status(500).send({ message: e.message, e });
+      return res.status(DEFAULT_ERROR).send({ message: e.message, e });
     });
 };
 
