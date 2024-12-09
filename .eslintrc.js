@@ -1,7 +1,3 @@
-let module;
-
-console.error("asdf");
-
 module.exports = {
   env: {
     es2021: true,
@@ -24,6 +20,7 @@ module.exports = {
     sourceType: "module",
   },
   rules: {
-    "no-console": ["error", { allow: ["warn"] }],
+    "no-console": "off",
+    "no-underscore-dangle": ["error", { allow: ["_id"] }],
   },
 };
