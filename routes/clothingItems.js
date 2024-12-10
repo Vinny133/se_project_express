@@ -8,19 +8,19 @@ const {
   deleteItem,
 } = require("../controllers/clothingItems");
 
-//Create
+// Create
 router.post("/", createItem);
 
-//Get
+// Get
 router.get("/", getItems);
 
-//Like
+// Like
 router.put("/:itemId/likes", likeItem);
 
-//Dislike
+// Dislike
 router.delete("/:itemId/likes", dislikeItem);
 
-//Delete
+// Delete
 router.delete("/:itemId", deleteItem);
 
 module.exports = router;
