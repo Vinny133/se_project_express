@@ -1,5 +1,5 @@
-const clothingItem = require("../models/clothingItem");
 const mongoose = require("mongoose");
+const clothingItem = require("../models/clothingItem");
 const {
   DEFAULT_ERROR,
   INVALID_ERROR_CODE,
@@ -41,16 +41,14 @@ const likeItem = (req, res) => {
     return res.status(INVALID_ERROR_CODE).send({ message: "Invalid ID" });
   }
 
-  clothingItem
+  return clothingItem
     .findByIdAndUpdate(
       itemId,
       { $addToSet: { likes: req.user._id } },
       { new: true }
     )
     .orFail()
-    .then((item) => {
-      return res.status(200).send({ data: item });
-    })
+    .then((item) => res.status(200).send({ data: item }))
     .catch((e) => {
       console.error(e);
 
@@ -68,16 +66,14 @@ const dislikeItem = (req, res) => {
     return res.status(INVALID_ERROR_CODE).send({ message: "Invalid ID" });
   }
 
-  clothingItem
+  return clothingItem
     .findByIdAndUpdate(
       itemId,
       { $pull: { likes: req.user._id } },
       { new: true }
     )
     .orFail()
-    .then((item) => {
-      return res.status(200).send({ data: item });
-    })
+    .then((item) => res.status(200).send({ data: item }))
     .catch((e) => {
       console.error(e);
 
@@ -96,7 +92,7 @@ const deleteItem = (req, res) => {
     return res.status(INVALID_ERROR_CODE).send({ message: "Invalid ID " });
   }
 
-  clothingItem
+  return clothingItem
     .findByIdAndDelete(itemId)
     .orFail()
     .then((item) => {
@@ -110,7 +106,8 @@ const deleteItem = (req, res) => {
 
       if (e.name === "CastError") {
         return res.status(INVALID_ERROR_CODE).send({ message: e.message, e });
-      } else if (e.name === "DocumentNotFoundError") {
+      }
+      if (e.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND_ERROR).send({ message: e.message, e });
       }
       return res.status(DEFAULT_ERROR).send({ message: e.message, e });
