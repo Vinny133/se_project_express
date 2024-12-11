@@ -20,7 +20,9 @@ const createItem = (req, res) => {
       if (e.name === "ValidationError") {
         return res.status(INVALID_ERROR_CODE).send({ message: e.message });
       }
-      return res.status(DEFAULT_ERROR).send({ message: e.message, e });
+      return res
+        .status(DEFAULT_ERROR)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -30,7 +32,9 @@ const getItems = (req, res) => {
     .then((items) => res.status(200).send(items))
     .catch((err) => {
       console.error(err);
-      res.status(DEFAULT_ERROR).send({ message: err.message, err });
+      res
+        .status(DEFAULT_ERROR)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -53,9 +57,11 @@ const likeItem = (req, res) => {
       console.error(e);
 
       if (e.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_ERROR).send({ message: e.message, e });
+        return res.status(NOT_FOUND_ERROR).send({ message: e.message });
       }
-      return res.status(DEFAULT_ERROR).send({ message: e.message, e });
+      return res
+        .status(DEFAULT_ERROR)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -78,9 +84,11 @@ const dislikeItem = (req, res) => {
       console.error(e);
 
       if (e.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_ERROR).send({ message: e.message, e });
+        return res.status(NOT_FOUND_ERROR).send({ message: e.message });
       }
-      return res.status(DEFAULT_ERROR).send({ message: e.message, e });
+      return res
+        .status(DEFAULT_ERROR)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -99,18 +107,20 @@ const deleteItem = (req, res) => {
       if (!item) {
         return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
       }
-      return res.status(200).send({});
+      return res.status(200).send({ data: item });
     })
     .catch((e) => {
       console.error(e);
 
       if (e.name === "CastError") {
-        return res.status(INVALID_ERROR_CODE).send({ message: e.message, e });
+        return res.status(INVALID_ERROR_CODE).send({ message: e.message });
       }
       if (e.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_ERROR).send({ message: e.message, e });
+        return res.status(NOT_FOUND_ERROR).send({ message: e.message });
       }
-      return res.status(DEFAULT_ERROR).send({ message: e.message, e });
+      return res
+        .status(DEFAULT_ERROR)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
