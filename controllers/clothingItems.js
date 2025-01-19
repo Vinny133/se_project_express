@@ -4,6 +4,7 @@ const {
   DEFAULT_ERROR,
   INVALID_ERROR_CODE,
   NOT_FOUND_ERROR,
+  FORBIDDEN_ERROR,
 } = require("../utils/errors");
 
 const createItem = (req, res) => {
@@ -94,29 +95,42 @@ const dislikeItem = (req, res) => {
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
+  const userId = req.user._id;
 
-  console.log(itemId);
+  console.log(`Attempting to delete item: ${itemId} by user: ${userId}`);
+
   if (!mongoose.Types.ObjectId.isValid(itemId)) {
     return res.status(INVALID_ERROR_CODE).send({ message: "Invalid ID " });
   }
 
   return clothingItem
-    .findByIdAndDelete(itemId)
+    .findById(itemId)
     .orFail()
     .then((item) => {
-      if (!item) {
-        return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
+      if (item.owner.toString() !== userId) {
+        console.log(`User ${userId} is not the owner of item ${itemId}`);
+        return Promise.reject({
+          status: FORBIDDEN_ERROR,
+          message: "You're not allowed to delete this item",
+        });
       }
-      return res.status(200).send({ data: item });
+
+      return clothingItem.findByIdAndDelete(itemId);
     })
+    .then(() => res.status(200).send({ data: "Item successfully deleted" }))
     .catch((e) => {
       console.error(e);
 
-      if (e.name === "CastError") {
-        return res.status(INVALID_ERROR_CODE).send({ message: e.message });
+      if (e.status === FORBIDDEN_ERROR) {
+        return res.status(FORBIDDEN_ERROR).send({ message: e.message });
       }
-      if (e.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_ERROR).send({ message: e.message });
+      if (e instanceof mongoose.Error.CastError) {
+        return res
+          .status(INVALID_ERROR_CODE)
+          .send({ message: "Invalid item ID format" });
+      }
+      if (e instanceof mongoose.Error.DocumentNotFoundError) {
+        return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
       }
       return res
         .status(DEFAULT_ERROR)
