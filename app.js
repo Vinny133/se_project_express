@@ -24,6 +24,7 @@ app.post("/signup", createUser);
 app.use(auth);
 
 app.use("/users", require("./routes/users"));
+
 app.use("/", mainRouter);
 
 app.listen(PORT, () => {

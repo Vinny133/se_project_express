@@ -109,10 +109,9 @@ const deleteItem = (req, res) => {
     .then((item) => {
       if (item.owner.toString() !== userId) {
         console.log(`User ${userId} is not the owner of item ${itemId}`);
-        return Promise.reject({
-          status: FORBIDDEN_ERROR,
-          message: "You're not allowed to delete this item",
-        });
+        return Promise.reject(
+          new Error("Forbidden: You're not allowed to delete this item")
+        );
       }
 
       return clothingItem.findByIdAndDelete(itemId);
@@ -121,7 +120,7 @@ const deleteItem = (req, res) => {
     .catch((e) => {
       console.error(e);
 
-      if (e.status === FORBIDDEN_ERROR) {
+      if (e.message.startsWith("Forbidden")) {
         return res.status(FORBIDDEN_ERROR).send({ message: e.message });
       }
       if (e instanceof mongoose.Error.CastError) {
