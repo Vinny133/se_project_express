@@ -1,11 +1,14 @@
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
+const { UNAUTHORIZED_ERROR } = require("../utils/errors");
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith("Bearer")) {
-    return res.status(401).send({ message: "Missing or malformed token" });
+    return res
+      .status(UNAUTHORIZED_ERROR)
+      .send({ message: "Missing or malformed token" });
   }
 
   const token = authorization.replace("Bearer ", "");
@@ -15,7 +18,7 @@ module.exports = (req, res, next) => {
     payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
     console.error(err);
-    return res.status(401).send({ message: "Invalid token" });
+    return res.status(UNAUTHORIZED_ERROR).send({ message: "Invalid token" });
   }
 
   req.user = payload;

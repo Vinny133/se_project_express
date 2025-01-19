@@ -6,18 +6,9 @@ const {
   DEFAULT_ERROR,
   INVALID_ERROR_CODE,
   NOT_FOUND_ERROR,
+  CONFLICT_ERROR,
+  UNAUTHORIZED_ERROR,
 } = require("../utils/errors");
-
-const getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.status(200).send(users))
-    .catch((err) => {
-      console.error(err);
-      return res
-        .status(DEFAULT_ERROR)
-        .send({ message: "An error has occurred on the server" });
-    });
-};
 
 const login = (req, res) => {
   const { email, password } = req.body;
@@ -36,8 +27,17 @@ const login = (req, res) => {
       res.send({ token });
     })
     .catch((err) => {
-      console.error(err);
-      res.status(401).send({ message: "Incorrect email or password" });
+      console.error("Login error:", err);
+
+      if (err.message.includes("Incorrect email or password")) {
+        return res
+          .status(UNAUTHORIZED_ERROR)
+          .send({ message: "Incorrect email or password" });
+      }
+
+      return res
+        .status(DEFAULT_ERROR)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -67,7 +67,7 @@ const createUser = (req, res) => {
       }
       if (err.code === 11000) {
         return res
-          .status(409)
+          .status(CONFLICT_ERROR)
           .send({ message: "User with this email already exists" });
       }
       return res
@@ -132,7 +132,6 @@ const updateUserProfile = (req, res) => {
 };
 
 module.exports = {
-  getUsers,
   createUser,
   getCurrentUser,
   login,

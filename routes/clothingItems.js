@@ -10,7 +10,7 @@ const {
 } = require("../controllers/clothingItems");
 
 // Create
-router.post("/", createItem);
+router.post("/", auth, createItem);
 
 // Get
 router.get("/", getItems);
