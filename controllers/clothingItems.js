@@ -6,6 +6,11 @@ const {
   NOT_FOUND_ERROR,
   FORBIDDEN_ERROR,
 } = require("../utils/errors");
+const BadRequestError = require("../errors/BadRequestError");
+const UnauthorizedError = require("../errors/UnauthorizedError");
+const ForbiddenError = require("../errors/ForbiddenError");
+const NotFoundError = require("../errors/NotFoundError");
+const ConflictError = require("../errors/ConflictError");
 
 const createItem = (req, res) => {
   console.log(req.body);
@@ -19,11 +24,9 @@ const createItem = (req, res) => {
     .catch((e) => {
       console.error(e);
       if (e.name === "ValidationError") {
-        return res.status(INVALID_ERROR_CODE).send({ message: e.message });
+        return next(new BadRequestError(e.message));
       }
-      return res
-        .status(DEFAULT_ERROR)
-        .send({ message: "An error has occurred on the server" });
+      return next(e);
     });
 };
 
@@ -32,10 +35,7 @@ const getItems = (req, res) => {
     .find({})
     .then((items) => res.status(200).send(items))
     .catch((err) => {
-      console.error(err);
-      res
-        .status(DEFAULT_ERROR)
-        .send({ message: "An error has occurred on the server" });
+      next(err);
     });
 };
 
@@ -58,11 +58,9 @@ const likeItem = (req, res) => {
       console.error(e);
 
       if (e.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_ERROR).send({ message: e.message });
+        return next(new NotFoundError(e.message));
       }
-      return res
-        .status(DEFAULT_ERROR)
-        .send({ message: "An error has occurred on the server" });
+      return next(e);
     });
 };
 
@@ -85,11 +83,9 @@ const dislikeItem = (req, res) => {
       console.error(e);
 
       if (e.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_ERROR).send({ message: e.message });
+        return next(new NotFoundError(e.message));
       }
-      return res
-        .status(DEFAULT_ERROR)
-        .send({ message: "An error has occurred on the server" });
+      return next(e);
     });
 };
 
@@ -121,19 +117,15 @@ const deleteItem = (req, res) => {
       console.error(e);
 
       if (e.message.startsWith("Forbidden")) {
-        return res.status(FORBIDDEN_ERROR).send({ message: e.message });
+        return next(new ForbiddenError(e.message));
       }
       if (e instanceof mongoose.Error.CastError) {
-        return res
-          .status(INVALID_ERROR_CODE)
-          .send({ message: "Invalid item ID format" });
+        return next(new BadRequestError(e.message));
       }
       if (e instanceof mongoose.Error.DocumentNotFoundError) {
-        return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
+        return next(new NotFoundError(e.message));
       }
-      return res
-        .status(DEFAULT_ERROR)
-        .send({ message: "An error has occurred on the server" });
+      return next(e);
     });
 };
 

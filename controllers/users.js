@@ -9,6 +9,11 @@ const {
   CONFLICT_ERROR,
   UNAUTHORIZED_ERROR,
 } = require("../utils/errors");
+const BadRequestError = require("../errors/BadRequestError");
+const UnauthorizedError = require("../errors/UnauthorizedError");
+const ForbiddenError = require("../errors/ForbiddenError");
+const NotFoundError = require("../errors/NotFoundError");
+const ConflictError = require("../errors/ConflictError");
 
 const login = (req, res) => {
   const { email, password } = req.body;
@@ -30,14 +35,10 @@ const login = (req, res) => {
       console.error("Login error:", err);
 
       if (err.message.includes("Incorrect email or password")) {
-        return res
-          .status(UNAUTHORIZED_ERROR)
-          .send({ message: "Incorrect email or password" });
+        return next(new UnauthorizedError(e.message));
       }
 
-      return res
-        .status(DEFAULT_ERROR)
-        .send({ message: "An error has occurred on the server" });
+      return next(e);
     });
 };
 
@@ -63,16 +64,12 @@ const createUser = (req, res) => {
       console.error(err);
 
       if (err.name === "ValidationError") {
-        return res.status(INVALID_ERROR_CODE).send({ message: err.message });
+        return next(new BadRequestError(e.message));
       }
       if (err.code === 11000) {
-        return res
-          .status(CONFLICT_ERROR)
-          .send({ message: "User with this email already exists" });
+        return next(new ConflictError(e.message));
       }
-      return res
-        .status(DEFAULT_ERROR)
-        .send({ message: "An error has occurred on the server" });
+      return next(e);
     });
 };
 
@@ -90,16 +87,12 @@ const getCurrentUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "NotFoundError") {
-        return res.status(NOT_FOUND_ERROR).send({ message: "User not found" });
+        return next(new NotFoundError(e.message));
       }
       if (err.name === "CastError") {
-        return res
-          .status(INVALID_ERROR_CODE)
-          .send({ message: "Invalid user ID" });
+        return next(new BadRequestError(e.message));
       }
-      return res
-        .status(DEFAULT_ERROR)
-        .send({ message: "An error has occurred on the server" });
+      return next(e);
     });
 };
 
@@ -121,13 +114,9 @@ const updateUserProfile = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res
-          .status(INVALID_ERROR_CODE)
-          .send({ message: "Invalid user data" });
+        return next(new BadRequestError(e.message));
       }
-      return res
-        .status(DEFAULT_ERROR)
-        .send({ message: "An error has occurred on the server" });
+      return next(e);
     });
 };
 
