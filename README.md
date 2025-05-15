@@ -16,10 +16,16 @@ Before committing your code, make sure you edit the file `sprint.txt` in the roo
 WTWR (What to Wear?) is a webpage designed to recommend clothing options based on the current weather, and this is the back-end part of the webpage. The back-end handles the creation, retrieval, and deletion of the site's user data and clothing items cards. The database authenticates user and clothing item info and takes care of all foreseeable errors appropriately. This database also implements the functionality of a like and dislike system for the clothing item images with their own error handling.
 
 **Technology used**
--Express js
--Node js
--Mongoose/MondoDB compass
--Postman
--Eslint
--Javascript
--React js
+
+- Express js
+- Node js
+- Mongoose/MondoDB compass
+- Postman
+- Eslint
+- Javascript
+- React js
+
+**Domain URL**
+https://whatwear.jumpingcrab.com
+https://www.whatwear.jumpingcrab.com
+https://api.whatwear.jumpingcrab.com
