@@ -6,9 +6,10 @@ module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith("Bearer")) {
-    return res
-      .status(UNAUTHORIZED_ERROR)
-      .send({ message: "Missing or malformed token" });
+    return next({
+      statusCode: UNAUTHORIZED_ERROR,
+      message: "Missing or malformed token",
+    });
   }
 
   const token = authorization.replace("Bearer ", "");
@@ -18,7 +19,10 @@ module.exports = (req, res, next) => {
     payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
     console.error(err);
-    return res.status(UNAUTHORIZED_ERROR).send({ message: "Invalid token" });
+    return next({
+      statusCode: UNAUTHORIZED_ERROR,
+      message: "Invalid token",
+    });
   }
 
   req.user = payload;

@@ -1,18 +1,10 @@
 const mongoose = require("mongoose");
 const clothingItem = require("../models/clothingItem");
-const {
-  DEFAULT_ERROR,
-  INVALID_ERROR_CODE,
-  NOT_FOUND_ERROR,
-  FORBIDDEN_ERROR,
-} = require("../utils/errors");
 const BadRequestError = require("../errors/BadRequestError");
-const UnauthorizedError = require("../errors/UnauthorizedError");
 const ForbiddenError = require("../errors/ForbiddenError");
 const NotFoundError = require("../errors/NotFoundError");
-const ConflictError = require("../errors/ConflictError");
 
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   console.log(req.body);
 
   const { name, weather, imageUrl } = req.body;
@@ -30,7 +22,7 @@ const createItem = (req, res) => {
     });
 };
 
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   clothingItem
     .find({})
     .then((items) => res.status(200).send(items))
@@ -39,11 +31,11 @@ const getItems = (req, res) => {
     });
 };
 
-const likeItem = (req, res) => {
+const likeItem = (req, res, next) => {
   const { itemId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(itemId)) {
-    return res.status(INVALID_ERROR_CODE).send({ message: "Invalid ID" });
+    return next(new BadRequestError("Invalid ID"));
   }
 
   return clothingItem
@@ -64,11 +56,11 @@ const likeItem = (req, res) => {
     });
 };
 
-const dislikeItem = (req, res) => {
+const dislikeItem = (req, res, next) => {
   const { itemId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(itemId)) {
-    return res.status(INVALID_ERROR_CODE).send({ message: "Invalid ID" });
+    return next(new BadRequestError("Invalid ID"));
   }
 
   return clothingItem
@@ -89,14 +81,14 @@ const dislikeItem = (req, res) => {
     });
 };
 
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
   console.log(`Attempting to delete item: ${itemId} by user: ${userId}`);
 
   if (!mongoose.Types.ObjectId.isValid(itemId)) {
-    return res.status(INVALID_ERROR_CODE).send({ message: "Invalid ID " });
+    return next(new BadRequestError("Invalid ID"));
   }
 
   return clothingItem

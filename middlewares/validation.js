@@ -15,8 +15,8 @@ module.exports.validateClothingItem = celebrate({
       "string.max": 'The maximum length of the "name" field is 30',
       "string.empty": 'The "name" field must be filled in',
     }),
-    weather: Joi.string().valid("hot", "warm", "cold").required(), // Assuming weather is an enum
-    imageUrl: Joi.string().required().custom(validateURL).messages({
+    weather: Joi.string().valid("hot", "warm", "cold").required(),
+    imageUrl: Joi.string().required().custom(validateUrl).messages({
       "string.empty": 'The "imageUrl" field must be filled in',
       "string.uri": 'The "imageUrl" field must be a valid URL',
     }),
@@ -25,8 +25,12 @@ module.exports.validateClothingItem = celebrate({
 
 module.exports.validateUserSignup = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    avatar: Joi.string().custom(validateUrl).messages({
+    name: Joi.string().required().min(2).max(30).messages({
+      "string.min": 'The minimum length of the "name" field is 2',
+      "string.max": 'The maximum length of the "name" field is 30',
+      "string.empty": 'The "name" field must be filled in',
+    }),
+    avatar: Joi.string().required().custom(validateUrl).messages({
       "string.empty": 'The "avatar" field must be filled in',
       "string.uri": 'The "avatar" field must be a valid URL',
     }),
@@ -55,6 +59,20 @@ module.exports.validateId = celebrate({
     itemId: Joi.string().hex().length(24).required().messages({
       "string.hex": "ID must be a valid hex string",
       "string.length": "ID must be 24 characters long",
+    }),
+  }),
+});
+
+module.exports.validateUserUpdate = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30).messages({
+      "string.min": 'The minimum length of the "name" field is 2',
+      "string.max": 'The maximum length of the "name" field is 30',
+      "string.empty": 'The "name" field must be filled in',
+    }),
+    avatar: Joi.string().required().custom(validateUrl).messages({
+      "string.empty": 'The "avatar" field must be filled in',
+      "string.uri": 'The "avatar" field must be a valid URL',
     }),
   }),
 });
